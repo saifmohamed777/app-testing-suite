@@ -1,0 +1,4 @@
+config.env
+reports/
+*.pcap
+__pycache__/

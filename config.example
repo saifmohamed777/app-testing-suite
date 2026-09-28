@@ -1,0 +1,11 @@
+# Copy to `config.env`, then edit the values.
+# Only use a URL and device that you own or have written permission to test.
+AUTHORIZED=NO
+TARGET_URL=https://staging.example.test
+# Optional: avoid DNS ambiguity and set it explicitly.
+# TARGET_HOST=staging.example.test
+# Optional local project checks:
+# SOURCE_DIR=/data/data/com.termux/files/home/my-app
+# Optional Postman/Newman collection; leave empty to skip it.
+# POSTMAN_COLLECTION=/data/data/com.termux/files/home/collection.json
+OUTPUT_DIR=./reports
