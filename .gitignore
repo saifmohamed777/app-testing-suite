@@ -2,3 +2,5 @@ config.env
 reports/
 *.pcap
 __pycache__/
+.DS_Store
+*.log
