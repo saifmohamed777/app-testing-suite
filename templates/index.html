@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 App Testing Suite</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header p { font-size: 1.1em; opacity: 0.9; }
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.4); }
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-area:hover { background: #f0f0f0; border-color: #764ba2; }
+        .upload-area.dragover { background: #e8e8ff; border-color: #764ba2; }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover { background: #764ba2; }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        .btn-secondary:hover { background: #e8e8ff; }
+        .progress-container {
+            display: none;
+            margin-top: 20px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .status.running { color: #667eea; }
+        .status.completed { color: #4caf50; }
+        .status.error { color: #f44336; }
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .report-card {
+            background: #f9f9f9;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .report-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+        .report-card h3 { color: #667eea; margin-bottom: 10px; }
+        .report-card p { color: #666; font-size: 0.9em; }
+        .file-input { display: none; }
+        .icon { font-size: 3em; margin-bottom: 10px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .header h1 { font-size: 1.8em; }
+        }
+        .file-list { margin-top: 15px; }
+        .file-item {
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .file-item a { color: #667eea; text-decoration: none; }
+        .file-item a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 App Testing Suite</h1>
+            <p>رفع ملف APK واختبره تلقائياً</p>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <h2>📤 رفع ملف APK</h2>
+                <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                    <div class="icon">📁</div>
+                    <p>اسحب ملف APK هنا أو اضغط للاختيار</p>
+                </div>
+                <input type="file" id="fileInput" class="file-input" accept=".apk">
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill">0%</div>
+                    </div>
+                    <div class="status" id="statusText">جاري التحضير...</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📊 الحالة الحالية</h2>
+                <div style="text-align: center; padding: 20px;">
+                    <div id="currentTest" style="font-size: 1.2em; color: #667eea; margin-bottom: 15px;">الانتظار...</div>
+                    <div id="currentProgress" style="font-size: 2em; color: #764ba2;">0%</div>
+                    <div id="currentStatus" style="margin-top: 15px; color: #666;">جاهز للاستخدام</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📋 التقارير السابقة</h2>
+            <div id="reportsList" class="reports-grid">
+                <p style="grid-column: 1/-1; text-align: center; color: #999;">جاري تحميل التقارير...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const statusText = document.getElementById('statusText');
+        const currentTest = document.getElementById('currentTest');
+        const currentProgress = document.getElementById('currentProgress');
+        const currentStatus = document.getElementById('currentStatus');
+        const reportsList = document.getElementById('reportsList');
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                uploadFile();
+            }
+        });
+
+        fileInput.addEventListener('change', uploadFile);
+
+        async function uploadFile() {
+            const file = fileInput.files[0];
+            if (!file) return;
+            if (!file.name.endsWith('.apk')) {
+                alert('الرجاء اختيار ملف APK');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            progressContainer.style.display = 'block';
+            statusText.textContent = 'جاري الرفع...';
+            statusText.classList.add('running');
+
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                statusText.textContent = '✓ تم الرفع - جاري الاختبار...';
+                startMonitoring();
+            } catch (error) {
+                statusText.textContent = '❌ خطأ في الرفع';
+                statusText.classList.remove('running');
+                statusText.classList.add('error');
+            }
+        }
+
+        async function startMonitoring() {
+            const interval = setInterval(async () => {
+                try {
+                    const response = await fetch('/api/status');
+                    const status = await response.json();
+
+                    currentTest.textContent = status.current_test || 'الانتظار...';
+                    currentProgress.textContent = status.progress + '%';
+                    currentStatus.textContent = status.status;
+                    progressFill.style.width = status.progress + '%';
+                    progressFill.textContent = status.progress + '%';
+
+                    if (!status.running) {
+                        statusText.classList.remove('running');
+                        statusText.classList.add('completed');
+                        statusText.textContent = '✅ اكتمل الاختبار!';
+                        clearInterval(interval);
+                        loadReports();
+                    }
+                } catch (error) {
+                    console.error('خطأ في المراقبة:', error);
+                }
+            }, 500);
+        }
+
+        async function loadReports() {
+            try {
+                const response = await fetch('/api/reports');
+                const reports = await response.json();
+                if (reports.length === 0) {
+                    reportsList.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999;">لا توجد تقارير</p>';
+                    return;
+                }
+                reportsList.innerHTML = reports.map(report => `
+                    <div class="report-card" onclick="viewReport('${report.path}')">
+                        <h3>📊 ${report.name}</h3>
+                        <p>عدد الملفات: ${report.files}</p>
+                        <small>انقر لعرض التفاصيل</small>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('خطأ في تحميل التقارير:', error);
+            }
+        }
+
+        async function viewReport(reportName) {
+            try {
+                const response = await fetch(`/api/report/${reportName}`);
+                const files = await response.json();
+                const content = Object.entries(files).map(([name, content]) => 
+                    `<h3>${name}</h3><pre>${content.substring(0, 500)}...</pre>`
+                ).join('');
+                alert('التقرير:\n' + Object.keys(files).join('\n'));
+            } catch (error) {
+                alert('خطأ في تحميل التقرير');
+            }
+        }
+
+        // Load reports on page load
+        loadReports();
+        setInterval(loadReports, 5000);
+    </script>
+</body>
+</html>

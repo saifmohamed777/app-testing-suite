@@ -1,6 +1,9 @@
 config.env
 reports/
+uploads/
 *.pcap
 __pycache__/
 .DS_Store
 *.log
+.git/
+node_modules/
